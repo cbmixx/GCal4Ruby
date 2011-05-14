@@ -151,7 +151,7 @@ module GCal4Ruby
     
     #Creates a new instance of the object
     def create
-      return service.send_request(GData4Ruby::Request.new(:post, CALENDAR_FEED, to_xml()))
+      return service.send_request(GData4Ruby::Request.new(:post, CALENDAR_FEED, to_xml(), { "Content-Type" => "application/atom+xml" }))
     end
     
     #Finds a Calendar based on a text query or by an id.  Parameters are:
@@ -221,6 +221,8 @@ module GCal4Ruby
           ele.attributes["value"] = @color
           when "selected"
           ele.attributes["value"] = @selected.to_s
+          when "where"
+          ele.attributes["valueString"] = @where
         end
       end
       xml.to_s
@@ -254,6 +256,8 @@ module GCal4Ruby
           end
           when 'accesslevel'
           @editable = (ele.attributes["value"] == 'editor' or ele.attributes["value"] == 'owner' or ele.attributes["value"] == 'root')
+          when 'where'
+          @where = ele.attributes["valueString"]
         end
       end
       
@@ -290,8 +294,8 @@ module GCal4Ruby
       @exists = true
       
       @id = (e = xml.at_css("id")) && 
-        e.content.gsub("http://www.google.com/calendar/feeds/default/calendars/", "")
-        .gsub("http://www.google.com/calendar/feeds/default/owncalendars/full/", "")
+        e.content.gsub("http://www.google.com/calendar/feeds/default/calendars/", "") \
+        .gsub("http://www.google.com/calendar/feeds/default/owncalendars/full/", "") \
         .gsub("http://www.google.com/calendar/feeds/default/allcalendars/full/", "")
 
       @summary = (e = xml.at_css("summary")) && e.content
